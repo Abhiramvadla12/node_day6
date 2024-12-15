@@ -2,11 +2,12 @@ let http = require("http");
 let url = require('url');
 let server = http.createServer(async(req,res)=>{
     let parsed_data = url.parse(req.url,true);
-    console.log(parsed_data);
-    if(parsed_data.pathname.split('/')[1]=="products"){
+    console.log(parsed_data.pathname.split('/').pop());
+    let dta = await fetch("https://fakestoreapi.com/products");
+    let api_data = await dta.json();
+    if(parsed_data.pathname.split('/').pop() !="products"){
         let param_data = parsed_data.pathname.split('/').pop();
-        let dta = await fetch("https://fakestoreapi.com/products");
-        let api_data = await dta.json();
+        
         const filter_data = api_data.filter((element)=>{
             return element.id == param_data;
         })
@@ -19,6 +20,10 @@ let server = http.createServer(async(req,res)=>{
             res.end();
         }
         
+    }
+    else if(parsed_data.pathname.split('/').pop() =="products"){
+        res.write(JSON.stringify(api_data));
+        res.end();
     }
     else{
         res.write("not found or enter only /products");
